@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seriale</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo">WYSZUKIWARKA FILMÓW</div>
+        <nav>
+            <a href="index.html">STRONA GŁÓWNA</a>
+            <a href="filmy.html">FILMY</a>
+            <a href="seriale.html">SERIALE</a>
+            <a href="ulubione.html">MOJE ULUBIONE</a>
+        </nav>
+    </header>
+
+    <main class="subpage-container">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3>SORTOWANIE</h3>
+                <label for="sort-rating">Ocena</label>
+                <select id="sort-rating">
+                    <option value="desc">Od najwyższej</option>
+                    <option value="asc">Od najniższej</option>
+                </select>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>GATUNEK</h3>
+                <div class="checkbox-group">
+                    <label><input type="checkbox"> Akcja</label>
+                    <label><input type="checkbox"> Sci-Fi</label>
+                    <label><input type="checkbox"> Komedia</label>
+                    <label><input type="checkbox"> Dramat</label>
+                    <label><input type="checkbox"> Horror</label>
+                </div>
+            </div>
+
+            <button class="filter-btn">ZASTOSUJ FILTRY</button>
+        </aside>
+
+        <section class="content-area">
+            <h2>WSZYSTKIE SERIALE</h2>
+            <div class="movies-grid">
+                <article class="card">
+                    <div class="poster-placeholder">PLAKAT</div>
+                    <h3>Tytuł Serialu 1</h3>
+                    <p>Ocena: 8.5/10</p>
+                </article>
+                <article class="card">
+                    <div class="poster-placeholder">PLAKAT</div>
+                    <h3>Tytuł Serialu 2</h3>
+                    <p>Ocena: 8.0/10</p>
+                </article>
+                <article class="card">
+                    <div class="poster-placeholder">PLAKAT</div>
+                    <h3>Tytuł Serialu 3</h3>
+                    <p>Ocena: 7.8/10</p>
+                </article>
+                <article class="card">
+                    <div class="poster-placeholder">PLAKAT</div>
+                    <h3>Tytuł Serialu 4</h3>
+                    <p>Ocena: 7.5/10</p>
+                </article>
+                <article class="card">
+                    <div class="poster-placeholder">PLAKAT</div>
+                    <h3>Tytuł Serialu 5</h3>
+                    <p>Ocena: 7.2/10</p>
+                </article>
+                <article class="card">
+                    <div class="poster-placeholder">PLAKAT</div>
+                    <h3>Tytuł Serialu 6</h3>
+                    <p>Ocena: 7.0/10</p>
+                </article>
+                <article class="card">
+                    <div class="poster-placeholder">PLAKAT</div>
+                    <h3>Tytuł Serialu 7</h3>
+                    <p>Ocena: 7.0/10</p>
+                </article>
+                <article class="card">
+                    <div class="poster-placeholder">PLAKAT</div>
+                    <h3>Tytuł Serialu 8</h3>
+                    <p>Ocena: 7.0/10</p>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p><b>Projekt WWW</b> | Autorzy: Kacper Kordaszewski, Paweł Klim, Jakub Konopka</p>
+    </footer>
+</body>
+</html>
