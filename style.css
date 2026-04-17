@@ -353,3 +353,51 @@ footer {
     background-color: #38bdf8;
     color: #05080f;
 }
+
+@media (max-width: 1024px) {
+    header {
+        flex-direction: column; 
+        padding: 20px;
+        gap: 20px;
+    }
+
+    nav {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap; 
+        gap: 20px;
+    }
+
+    nav a {
+        margin-left: 0; 
+    }
+}
+
+@media (max-width: 768px) {
+    
+    .hero {
+        padding: 50px 20px; 
+    }
+
+    .hero h1 {
+        font-size: 32px; 
+    }
+
+    .search-box {
+        flex-direction: column; 
+    }
+
+    .search-box input,
+    .search-box button {
+        width: 100%; 
+        max-width: 100%;
+    }
+
+    .media-row {
+        padding: 20px 20px 0px 20px; 
+    }
+
+    .grid-container {
+        grid-auto-columns: 200px; 
+    }
+}
