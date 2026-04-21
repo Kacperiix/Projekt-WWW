@@ -371,6 +371,44 @@ footer {
     nav a {
         margin-left: 0; 
     }
+    .subpage-container {
+        flex-direction: column; 
+        padding: 20px;
+        gap: 20px;
+    }
+
+    .sidebar {
+        flex: none;
+        width: 100%;
+        position: relative;
+        top: 0;
+        margin-bottom: 20px;
+    }
+
+    .details-container {
+        flex-direction: column; 
+        padding: 20px;
+        gap: 30px;
+    }
+
+    .details-poster-placeholder {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    .details-info {
+        text-align: center;
+    }
+
+    .movie-meta {
+        justify-content: center;
+    }
+
+    .favorite-btn {
+        align-self: center; 
+        width: 100%;
+    }
 }
 
 @media (max-width: 768px) {
@@ -399,5 +437,21 @@ footer {
 
     .grid-container {
         grid-auto-columns: 200px; 
+    }
+    .movie-title {
+        font-size: 32px;
+    }
+
+    .movies-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Mniejsze kafelki na telefonach */
+        gap: 15px;
+    }
+
+    .card h3 {
+        font-size: 14px;
+    }
+
+    .logo {
+        font-size: 20px;
     }
 }
