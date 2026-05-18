@@ -5,41 +5,54 @@ const searchBtn = document.getElementById('search-btn');
 const moviesHeading = document.getElementById('movies-heading');
 const seriesHeading = document.getElementById('series-heading');
 
-const movies = [
-    { id: 1, title: "Mroczny Rycerz", rating: "9.0/10" },
-    { id: 2, title: "Incepcja", rating: "8.8/10" },
-    { id: 3, title: "Interstellar", rating: "8.6/10" },
-    { id: 4, title: "Matrix", rating: "8.7/10" },
-    { id: 5, title: "Diuna", rating: "8.3/10" },
-    { id: 6, title: "Gladiator", rating: "8.5/10" },
-    { id: 7, title: "Władca Pierścieni", rating: "9.0/10" },
-    { id: 8, title: "Joker", rating: "8.4/10" },
-    { id: 9, title: "Oppenheimer", rating: "8.6/10" },
-    { id: 10, title: "Spider-Man", rating: "8.2/10" }
-];
+const API_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlZjlhZjE3ODhhZjQ2NTA0MzhiNTdhMDU0MzQ0MGNiNyIsIm5iZiI6MTc3MjMwMDMwMC45MTI5OTk5LCJzdWIiOiI2OWEzMjgwY2Q0YWFhNGZiYWNkZThiZTUiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.45vJNS3Y-jtt7uM0pD68V9u4-nSyVkxi2S8HCulZMnU';
 
-const series = [
-    { id: 101, title: "Breaking Bad", rating: "9.5/10" },
-    { id: 102, title: "Gra o Tron", rating: "9.2/10" },
-    { id: 103, title: "The Office", rating: "8.9/10" },
-    { id: 104, title: "Stranger Things", rating: "8.7/10" },
-    { id: 105, title: "Czarnobyl", rating: "9.4/10" },
-    { id: 106, title: "The Last of Us", rating: "8.8/10" },
-    { id: 107, title: "Sukcesja", rating: "8.8/10" },
-    { id: 108, title: "Wiedźmin", rating: "8.1/10" },
-    { id: 109, title: "Narcos", rating: "8.8/10" },
-    { id: 110, title: "Peaky Blinders", rating: "8.8/10" }
-];
+const API_URL = 'https://api.themoviedb.org/3';
+const IMG_URL = 'https://image.tmdb.org/t/p/w500';
+
+const opcjeZapytania = {
+    method: 'GET',
+    headers: {
+        accept: 'application/json',
+        Authorization: `Bearer ${API_TOKEN}`
+    }
+};
+
+async function pobierzPopularneFilmy() {
+    const odpowiedz = await fetch(`${API_URL}/movie/popular?language=pl-PL&page=1`, opcjeZapytania);
+    const dane = await odpowiedz.json();
+    wyswietlFilmy(dane.results.slice(0, 10)); 
+}
+
+async function pobierzPopularneSeriale() {
+    const odpowiedz = await fetch(`${API_URL}/tv/popular?language=pl-PL&page=1`, opcjeZapytania);
+    const dane = await odpowiedz.json();
+    wyswietlSeriale(dane.results.slice(0, 10));
+}
+
+async function szukajWApi(slowo) {
+    const odpowiedz = await fetch(`${API_URL}/search/multi?query=${slowo}&language=pl-PL&page=1`, opcjeZapytania);
+    const dane = await odpowiedz.json();
+    const tylkoFilmyISeriale = dane.results.filter(item => item.media_type !== 'person');
+    wyswietlFilmy(tylkoFilmyISeriale);
+}
 
 function wyswietlFilmy(listaFilmow) {
     moviesContainer.innerHTML = ''; 
     
     listaFilmow.forEach(film => {
+        const tytul = film.title || film.name; 
+        const ocena = film.vote_average ? film.vote_average.toFixed(1) + '/10' : 'Brak';
+        
+        const plakatWizualny = film.poster_path 
+            ? `<img src="${IMG_URL}${film.poster_path}" alt="${tytul}" class="movie-poster">`
+            : `<div class="poster-placeholder">PLAKAT</div>`;
+
         const kafelekHTML = `
             <article class="card" onclick="zapiszIPrzejdz(${film.id})">
-                <div class="poster-placeholder">PLAKAT</div>
-                <h3>${film.title}</h3>
-                <p>Ocena: ${film.rating}</p>
+                ${plakatWizualny}
+                <h3>${tytul}</h3>
+                <p>Ocena: ⭐ ${ocena}</p>
             </article>
         `;
         moviesContainer.innerHTML += kafelekHTML;
@@ -50,11 +63,18 @@ function wyswietlSeriale(listaSeriali) {
     seriesContainer.innerHTML = ''; 
     
     listaSeriali.forEach(serial => {
+        const tytul = serial.name;
+        const ocena = serial.vote_average ? serial.vote_average.toFixed(1) + '/10' : 'Brak';
+        
+        const plakatWizualny = serial.poster_path 
+            ? `<img src="${IMG_URL}${serial.poster_path}" alt="${tytul}" class="movie-poster">`
+            : `<div class="poster-placeholder">PLAKAT</div>`;
+
         const kafelekHTML = `
             <article class="card" onclick="zapiszIPrzejdz(${serial.id})">
-                <div class="poster-placeholder">PLAKAT</div>
-                <h3>${serial.title}</h3>
-                <p>Ocena: ${serial.rating}</p>
+                ${plakatWizualny}
+                <h3>${tytul}</h3>
+                <p>Ocena: ⭐ ${ocena}</p>
             </article>
         `;
         seriesContainer.innerHTML += kafelekHTML;
@@ -62,31 +82,23 @@ function wyswietlSeriale(listaSeriali) {
 }
 
 searchBtn.addEventListener('click', function() {
-    const wpisaneSlowo = searchInput.value.toLowerCase().trim();
+    const wpisaneSlowo = searchInput.value.trim();
     const sekcjaSeriali = seriesContainer.parentElement;
 
     if (wpisaneSlowo === '') {
         moviesHeading.innerText = 'POPULARNE W TYM TYGODNIU: FILMY';
         seriesHeading.innerText = 'POPULARNE W TYM TYGODNIU: SERIALE';
-        
         sekcjaSeriali.style.display = 'block';
-
-        wyswietlFilmy(movies);
-        wyswietlSeriale(series);
+        moviesContainer.classList.remove('search-mode');
+        
+        pobierzPopularneFilmy();
+        pobierzPopularneSeriale();
     } else {
         moviesHeading.innerText = `WYNIKI WYSZUKIWANIA: "${wpisaneSlowo.toUpperCase()}"`;
         sekcjaSeriali.style.display = 'none';
-
-        const przefiltrowaneFilmy = movies.filter(film => {
-            return film.title.toLowerCase().includes(wpisaneSlowo);
-        });
-
-        const przefiltrowaneSeriale = series.filter(serial => {
-            return serial.title.toLowerCase().includes(wpisaneSlowo);
-        });
-
-        const polaczoneWyniki = przefiltrowaneFilmy.concat(przefiltrowaneSeriale);
-        wyswietlFilmy(polaczoneWyniki);
+        moviesContainer.classList.add('search-mode');
+        
+        szukajWApi(wpisaneSlowo);
     }
 });
 
@@ -101,5 +113,5 @@ function zapiszIPrzejdz(id) {
     window.location.href = 'detale.html';
 }
 
-wyswietlFilmy(movies);
-wyswietlSeriale(series);
+pobierzPopularneFilmy();
+pobierzPopularneSeriale();
