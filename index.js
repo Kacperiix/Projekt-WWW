@@ -48,8 +48,10 @@ function wyswietlFilmy(listaFilmow) {
             ? `<img src="${IMG_URL}${film.poster_path}" alt="${tytul}" class="movie-poster">`
             : `<div class="poster-placeholder">PLAKAT</div>`;
 
+        const typMedia = film.media_type || 'movie';
+
         const kafelekHTML = `
-            <article class="card" onclick="zapiszIPrzejdz(${film.id})">
+            <article class="card" onclick="zapiszIPrzejdz(${film.id}, '${typMedia}')">
                 ${plakatWizualny}
                 <h3>${tytul}</h3>
                 <p>Ocena: ⭐ ${ocena}</p>
@@ -71,7 +73,7 @@ function wyswietlSeriale(listaSeriali) {
             : `<div class="poster-placeholder">PLAKAT</div>`;
 
         const kafelekHTML = `
-            <article class="card" onclick="zapiszIPrzejdz(${serial.id})">
+            <article class="card" onclick="zapiszIPrzejdz(${serial.id}, 'tv')">
                 ${plakatWizualny}
                 <h3>${tytul}</h3>
                 <p>Ocena: ⭐ ${ocena}</p>
@@ -108,8 +110,9 @@ searchInput.addEventListener('keypress', function(event) {
     }
 });
 
-function zapiszIPrzejdz(id) {
+function zapiszIPrzejdz(id, typ) {
     localStorage.setItem('kliknieteID', id);
+    localStorage.setItem('typMedia', typ);
     window.location.href = 'detale.html';
 }
 

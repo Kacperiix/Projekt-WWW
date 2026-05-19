@@ -42,6 +42,7 @@ function wyswietlWszystkieFilmy(listaFilmow) {
 
 function zapiszIPrzejdz(id) {
     localStorage.setItem('kliknieteID', id);
+    localStorage.setItem('typMedia', 'movie');
     window.location.href = 'detale.html';
 }
 

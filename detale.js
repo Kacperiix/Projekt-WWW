@@ -1,53 +1,84 @@
 const titleElement = document.getElementById('details-title');
 const ratingElement = document.getElementById('details-rating');
+const posterElement = document.getElementById('details-poster');
+const yearElement = document.getElementById('details-year');
+const genresElement = document.getElementById('details-genres');
+const descElement = document.getElementById('details-desc');
+const castElement = document.getElementById('details-cast');
 const favBtn = document.getElementById('fav-btn');
 
-const movies = [
-    { id: 1, title: "Mroczny Rycerz", rating: "9.0/10" },
-    { id: 2, title: "Incepcja", rating: "8.8/10" },
-    { id: 3, title: "Interstellar", rating: "8.6/10" },
-    { id: 4, title: "Matrix", rating: "8.7/10" },
-    { id: 5, title: "Diuna", rating: "8.3/10" },
-    { id: 6, title: "Gladiator", rating: "8.5/10" },
-    { id: 7, title: "Władca Pierścieni", rating: "9.0/10" },
-    { id: 8, title: "Joker", rating: "8.4/10" },
-    { id: 9, title: "Oppenheimer", rating: "8.6/10" },
-    { id: 10, title: "Spider-Man", rating: "8.2/10" }
-];
+const API_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlZjlhZjE3ODhhZjQ2NTA0MzhiNTdhMDU0MzQ0MGNiNyIsIm5iZiI6MTc3MjMwMDMwMC45MTI5OTk5LCJzdWIiOiI2OWEzMjgwY2Q0YWFhNGZiYWNkZThiZTUiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.45vJNS3Y-jtt7uM0pD68V9u4-nSyVkxi2S8HCulZMnU';
+const API_URL = 'https://api.themoviedb.org/3';
+const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 
-const series = [
-    { id: 101, title: "Breaking Bad", rating: "9.5/10" },
-    { id: 102, title: "Gra o Tron", rating: "9.2/10" },
-    { id: 103, title: "The Office", rating: "8.9/10" },
-    { id: 104, title: "Stranger Things", rating: "8.7/10" },
-    { id: 105, title: "Czarnobyl", rating: "9.4/10" },
-    { id: 106, title: "The Last of Us", rating: "8.8/10" },
-    { id: 107, title: "Sukcesja", rating: "8.8/10" },
-    { id: 108, title: "Wiedźmin", rating: "8.1/10" },
-    { id: 109, title: "Narcos", rating: "8.8/10" },
-    { id: 110, title: "Peaky Blinders", rating: "8.8/10" }
-];
-
-const allMedia = movies.concat(series);
-const savedId = localStorage.getItem('kliknieteID');
-let wybranyTytul = null;
-
-if (savedId) {
-    wybranyTytul = allMedia.find(item => item.id == savedId);
-
-    if (wybranyTytul) {
-        titleElement.innerText = wybranyTytul.title;
-        ratingElement.innerText = `⭐ ${wybranyTytul.rating}`;
+const opcjeZapytania = {
+    method: 'GET',
+    headers: {
+        accept: 'application/json',
+        Authorization: `Bearer ${API_TOKEN}`
     }
-} else {
-    titleElement.innerText = "Nie wybrano żadnego tytułu";
-    ratingElement.innerText = "-";
+};
+
+const savedId = localStorage.getItem('kliknieteID');
+const savedType = localStorage.getItem('typMedia') || 'movie';
+
+async function pobierzDetale() {
+    if (!savedId) {
+        titleElement.innerText = "Nie wybrano żadnego tytułu";
+        return;
+    }
+
+    try {
+        let url = `${API_URL}/${savedType}/${savedId}?language=pl-PL&append_to_response=credits`;
+        let odpowiedz = await fetch(url, opcjeZapytania);
+        let dane = await odpowiedz.json();
+
+        if (dane.id) {
+            wypelnijDane(dane);
+            obslugaUlubionych(dane);
+        } else {
+            titleElement.innerText = "Nie znaleziono tytułu w bazie";
+        }
+
+    } catch (error) {
+        titleElement.innerText = "Błąd pobierania danych";
+    }
 }
 
-let ulubioneFilmy = JSON.parse(localStorage.getItem('ulubione')) || [];
+function wypelnijDane(dane) {
+    const tytul = dane.title || dane.name;
+    titleElement.innerText = tytul;
 
-if (wybranyTytul) {
-    let czyWulubionych = ulubioneFilmy.some(film => film.id == wybranyTytul.id);
+    const ocena = dane.vote_average ? dane.vote_average.toFixed(1) + '/10' : 'Brak';
+    ratingElement.innerText = `⭐ ${ocena}`;
+
+    const dataWydania = dane.release_date || dane.first_air_date || 'Brak daty';
+    yearElement.innerText = `📅 ${dataWydania.split('-')[0]}`;
+
+    const gatunki = dane.genres && dane.genres.length > 0 
+        ? dane.genres.map(g => g.name).join(', ') 
+        : 'Brak określonego gatunku';
+    genresElement.innerText = `🎬 ${gatunki}`;
+
+    descElement.innerText = dane.overview || 'Baza TMDB nie posiada jeszcze polskiego opisu fabuły dla tego tytułu.';
+
+    const obsada = dane.credits && dane.credits.cast && dane.credits.cast.length > 0 
+        ? dane.credits.cast.slice(0, 5).map(aktor => aktor.name).join(', ') 
+        : 'Brak danych o obsadzie';
+    castElement.innerText = obsada;
+
+    if (dane.poster_path) {
+        posterElement.innerHTML = `<img src="${IMG_URL}${dane.poster_path}" alt="${tytul}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
+        posterElement.style.backgroundColor = "transparent";
+    } else {
+        posterElement.innerHTML = "BRAK PLAKATU";
+    }
+}
+
+function obslugaUlubionych(dane) {
+    let ulubioneFilmy = JSON.parse(localStorage.getItem('ulubione')) || [];
+    let czyWulubionych = ulubioneFilmy.some(film => film.id === dane.id);
+    const tytul = dane.title || dane.name;
 
     if (czyWulubionych) {
         favBtn.innerText = "❤️ W ULUBIONYCH";
@@ -57,28 +88,31 @@ if (wybranyTytul) {
 
     favBtn.addEventListener('click', function() {
         if (czyWulubionych) {            
-            ulubioneFilmy = ulubioneFilmy.filter(film => film.id != wybranyTytul.id);
-            
+            ulubioneFilmy = ulubioneFilmy.filter(film => film.id !== dane.id);
             localStorage.setItem('ulubione', JSON.stringify(ulubioneFilmy));
             czyWulubionych = false;
             
             favBtn.innerText = "❤ Dodaj do ulubionych";
             favBtn.style.backgroundColor = "transparent";
             favBtn.style.color = "#38bdf8";
-            
-            alert(`Usunięto "${wybranyTytul.title}" z ulubionych.`);
-            
         } else {
-            ulubioneFilmy.push(wybranyTytul);
+            const filmDoZapisu = {
+                id: dane.id,
+                title: tytul,
+                poster_path: dane.poster_path,
+                vote_average: dane.vote_average,
+                typ: savedType
+            };
             
+            ulubioneFilmy.push(filmDoZapisu);
             localStorage.setItem('ulubione', JSON.stringify(ulubioneFilmy));
             czyWulubionych = true;
             
             favBtn.innerText = "❤️ W ULUBIONYCH";
             favBtn.style.backgroundColor = "#38bdf8";
             favBtn.style.color = "#05080f";
-            
-            alert(`Dodano "${wybranyTytul.title}" do ulubionych!`);
         }
     });
 }
+
+pobierzDetale();

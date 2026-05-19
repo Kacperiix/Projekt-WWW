@@ -42,6 +42,7 @@ function wyswietlWszystkieSeriale(listaSeriali) {
 
 function zapiszIPrzejdz(id) {
     localStorage.setItem('kliknieteID', id);
+    localStorage.setItem('typMedia', 'tv');
     window.location.href = 'detale.html';
 }
 
