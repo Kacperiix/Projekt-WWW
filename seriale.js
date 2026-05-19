@@ -1,26 +1,39 @@
 const seriesPageContainer = document.getElementById('series-page-container');
 
-const series = [
-    { id: 101, title: "Breaking Bad", rating: "9.5/10" },
-    { id: 102, title: "Gra o Tron", rating: "9.2/10" },
-    { id: 103, title: "The Office", rating: "8.9/10" },
-    { id: 104, title: "Stranger Things", rating: "8.7/10" },
-    { id: 105, title: "Czarnobyl", rating: "9.4/10" },
-    { id: 106, title: "The Last of Us", rating: "8.8/10" },
-    { id: 107, title: "Sukcesja", rating: "8.8/10" },
-    { id: 108, title: "Wiedźmin", rating: "8.1/10" },
-    { id: 109, title: "Narcos", rating: "8.8/10" },
-    { id: 110, title: "Peaky Blinders", rating: "8.8/10" }
-];
+const API_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlZjlhZjE3ODhhZjQ2NTA0MzhiNTdhMDU0MzQ0MGNiNyIsIm5iZiI6MTc3MjMwMDMwMC45MTI5OTk5LCJzdWIiOiI2OWEzMjgwY2Q0YWFhNGZiYWNkZThiZTUiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.45vJNS3Y-jtt7uM0pD68V9u4-nSyVkxi2S8HCulZMnU';
+const API_URL = 'https://api.themoviedb.org/3';
+const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 
-function wyswietlWszystkieSeriale() {
+const opcjeZapytania = {
+    method: 'GET',
+    headers: {
+        accept: 'application/json',
+        Authorization: `Bearer ${API_TOKEN}`
+    }
+};
+
+async function pobierzSerialeZApi() {
+    const odpowiedz = await fetch(`${API_URL}/discover/tv?language=pl-PL&page=1&sort_by=popularity.desc`, opcjeZapytania);
+    const dane = await odpowiedz.json();
+    wyswietlWszystkieSeriale(dane.results);
+}
+
+function wyswietlWszystkieSeriale(listaSeriali) {
     seriesPageContainer.innerHTML = ''; 
-    series.forEach(serial => {
+    
+    listaSeriali.forEach(serial => {
+        const tytul = serial.name; 
+        const ocena = serial.vote_average ? serial.vote_average.toFixed(1) + '/10' : 'Brak';
+        
+        const plakatWizualny = serial.poster_path 
+            ? `<img src="${IMG_URL}${serial.poster_path}" alt="${tytul}" class="movie-poster">`
+            : `<div class="poster-placeholder">PLAKAT</div>`;
+
         const kafelekHTML = `
             <article class="card" onclick="zapiszIPrzejdz(${serial.id})">
-                <div class="poster-placeholder">PLAKAT</div>
-                <h3>${serial.title}</h3>
-                <p>Ocena: ${serial.rating}</p>
+                ${plakatWizualny}
+                <h3>${tytul}</h3>
+                <p>Ocena: ⭐ ${ocena}</p>
             </article>
         `;
         seriesPageContainer.innerHTML += kafelekHTML;
@@ -31,4 +44,5 @@ function zapiszIPrzejdz(id) {
     localStorage.setItem('kliknieteID', id);
     window.location.href = 'detale.html';
 }
-wyswietlWszystkieSeriale();
+
+pobierzSerialeZApi();

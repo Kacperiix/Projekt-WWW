@@ -1,33 +1,48 @@
 const moviesPageContainer = document.getElementById('movies-page-container');
 
-const movies = [
-    { id: 1, title: "Mroczny Rycerz", rating: "9.0/10" },
-    { id: 2, title: "Incepcja", rating: "8.8/10" },
-    { id: 3, title: "Interstellar", rating: "8.6/10" },
-    { id: 4, title: "Matrix", rating: "8.7/10" },
-    { id: 5, title: "Diuna", rating: "8.3/10" },
-    { id: 6, title: "Gladiator", rating: "8.5/10" },
-    { id: 7, title: "Władca Pierścieni", rating: "9.0/10" },
-    { id: 8, title: "Joker", rating: "8.4/10" },
-    { id: 9, title: "Oppenheimer", rating: "8.6/10" },
-    { id: 10, title: "Spider-Man", rating: "8.2/10" }
-];
+const API_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlZjlhZjE3ODhhZjQ2NTA0MzhiNTdhMDU0MzQ0MGNiNyIsIm5iZiI6MTc3MjMwMDMwMC45MTI5OTk5LCJzdWIiOiI2OWEzMjgwY2Q0YWFhNGZiYWNkZThiZTUiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.45vJNS3Y-jtt7uM0pD68V9u4-nSyVkxi2S8HCulZMnU';
+const API_URL = 'https://api.themoviedb.org/3';
+const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 
-function wyswietlWszystkieFilmy() {
+const opcjeZapytania = {
+    method: 'GET',
+    headers: {
+        accept: 'application/json',
+        Authorization: `Bearer ${API_TOKEN}`
+    }
+};
+
+async function pobierzFilmyZApi() {
+    const odpowiedz = await fetch(`${API_URL}/discover/movie?language=pl-PL&page=1&sort_by=popularity.desc`, opcjeZapytania);
+    const dane = await odpowiedz.json();
+    wyswietlWszystkieFilmy(dane.results);
+}
+
+function wyswietlWszystkieFilmy(listaFilmow) {
     moviesPageContainer.innerHTML = ''; 
-    movies.forEach(film => {
+    
+    listaFilmow.forEach(film => {
+        const tytul = film.title; 
+        const ocena = film.vote_average ? film.vote_average.toFixed(1) + '/10' : 'Brak';
+        
+        const plakatWizualny = film.poster_path 
+            ? `<img src="${IMG_URL}${film.poster_path}" alt="${tytul}" class="movie-poster">`
+            : `<div class="poster-placeholder">PLAKAT</div>`;
+
         const kafelekHTML = `
             <article class="card" onclick="zapiszIPrzejdz(${film.id})">
-                <div class="poster-placeholder">PLAKAT</div>
-                <h3>${film.title}</h3>
-                <p>Ocena: ${film.rating}</p>
+                ${plakatWizualny}
+                <h3>${tytul}</h3>
+                <p>Ocena: ⭐ ${ocena}</p>
             </article>
         `;
         moviesPageContainer.innerHTML += kafelekHTML;
     });
 }
+
 function zapiszIPrzejdz(id) {
     localStorage.setItem('kliknieteID', id);
     window.location.href = 'detale.html';
 }
-wyswietlWszystkieFilmy();
+
+pobierzFilmyZApi();
