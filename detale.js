@@ -98,9 +98,6 @@ function obslugaUlubionych(dane) {
         } else {
             const filmDoZapisu = {
                 id: dane.id,
-                title: tytul,
-                poster_path: dane.poster_path,
-                vote_average: dane.vote_average,
                 typ: savedType
             };
             

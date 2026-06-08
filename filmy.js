@@ -4,6 +4,18 @@ const API_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlZjlhZjE3ODhhZjQ2NTA0MzhiNTdh
 const API_URL = 'https://api.themoviedb.org/3';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 
+const filterBtn = document.querySelector('.filter-btn');
+const sortSelect = document.getElementById('sort-rating');
+const checkboxes = document.querySelectorAll('.checkbox-group input');
+
+const mapaGatunkow = {
+    0: 28,  
+    1: 878, 
+    2: 35,  
+    3: 18,  
+    4: 27   
+};
+
 const opcjeZapytania = {
     method: 'GET',
     headers: {
@@ -12,8 +24,18 @@ const opcjeZapytania = {
     }
 };
 
-async function pobierzFilmyZApi() {
-    const odpowiedz = await fetch(`${API_URL}/discover/movie?language=pl-PL&page=1&sort_by=popularity.desc`, opcjeZapytania);
+async function pobierzFilmyZApi(sortujPo = 'popularity.desc', gatunkiIds = '') {
+    let url = `${API_URL}/discover/movie?language=pl-PL&page=1&sort_by=${sortujPo}`;
+    
+    if (sortujPo.includes('vote_average')) {
+        url += '&vote_count.gte=200';
+    }
+    
+    if (gatunkiIds) {
+        url += `&with_genres=${gatunkiIds}`;
+    }
+
+    const odpowiedz = await fetch(url, opcjeZapytania);
     const dane = await odpowiedz.json();
     wyswietlWszystkieFilmy(dane.results);
 }
@@ -45,5 +67,19 @@ function zapiszIPrzejdz(id) {
     localStorage.setItem('typMedia', 'movie');
     window.location.href = 'detale.html';
 }
+
+filterBtn.addEventListener('click', function() {
+    const wybranySort = sortSelect.value === 'desc' ? 'vote_average.desc' : 'vote_average.asc';
+    
+    let wybraneGatunki = [];
+    checkboxes.forEach((box, index) => {
+        if (box.checked) {
+            wybraneGatunki.push(mapaGatunkow[index]);
+        }
+    });
+    
+    const gatunkiString = wybraneGatunki.join('|');
+    pobierzFilmyZApi(wybranySort, gatunkiString);
+});
 
 pobierzFilmyZApi();
